@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Predicting MLB 2012 | Involution Studios Infovis</title>
+    <link href='http://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here' rel='stylesheet' type='text/css'>
+    <link href="_styles/mainstyle.css" rel="stylesheet" type="text/css">
+    <meta name="description" content="Involution studios' moneyball is an application developed to visualize the relationship between MLB payroll information, and the winningness of each fanchise.">
+    <meta name="keywords" content="arlington, studio, ma, design, designer, ui, interface, software, studios, engineer, ux, frontend, intern, javascript, involution, juhansonin, invo, goinvo, dannyhadley">
+    <script src="_scripts/d3.v2.js" type="text/javascript"></script>
+    <script src="_scripts/jquery-1.7.1.js" type="text/javascript"></script>
+    <script src="_scripts/moneyball.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="top">
+    	<div id="header"></div>
+    </div>
+    <div id="middle">
+    	<div id="visnav">
+        	<div id="middlesetter">
+        		<div id="current">
+            	</div>
+            	<div id="buttons">
+                	<div class="vischanger indi_off" id="indi"></div>
+                	<div class="vischanger all_on" id="all"></div>
+                    <div class="clear"></div>
+                    
+            	</div>
+            	<div class="clear"></div>
+            </div>
+        </div>
+		<div id="vis">
+   		</div>
+        <div id="visinfo">
+        	<div id="visinfomiddler">
+        	<div class="info" id="about_vis">
+        		<h3>What am I looking at?</h3>
+           		<hr>
+            	<p id="info_text">This info vis shows the payroll and wins per season for 30 teams. Hovering over the bar graphs for each eam gives you more details. For the current year, the wins are a prediction.</p>
+        	</div>
+        	<div class="info" id="sources">
+        		<h3>Data Sources</h3>
+        		<hr>
+            	<ul>
+            		<li><a href="http://espn.go.com/" title="">espn.com</a></li>
+                	<li><a href="http://mlb.mlb.com/index.jsp" title="">mlb.com</a></li>
+                	<li><a href="http://www.baseballprospectus.com/" title="">baseball prospectus.com</a></li>
+                	<li><a href="http://www.stevetheump.com/" title="">steve the ump.com</a></li>
+            	</ul>
+        	</div>
+        	<div class="clear"></div>
+            </div>
+        </div>
+    </div>
+	<div id="bottom">
+    <div id="invo">
+    	<p>a dadleyy production</p>
+    </div>
+    </div>
+</body>
+</html>
