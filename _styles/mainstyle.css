@@ -71,7 +71,7 @@ body{
 	float:right;
 }
 
-#invo{
+#dadleyy{
 	width:170px;
 	height:37px;
 	margin-left:10px;
@@ -172,10 +172,11 @@ body{
 #about_vis{
 	margin-left:130px;
 }
-#invo p{
-font-family: 'Just Me Again Down Here', cursive;
-color:rgba(0,0,0,0.4);
-text-shadow:1px 1px rgba(255,255,255,0.2);
+#dadleyy a{
+	text-decoration: none;
+	font-family: 'Just Me Again Down Here', cursive;
+	color:rgba(0,0,0,0.4);
+	text-shadow:1px 1px rgba(255,255,255,0.2);
 }
 
 

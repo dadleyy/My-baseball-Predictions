@@ -6,8 +6,6 @@ Written  by:    Danny Hadley
 Produced by:    Involution Studios
 With help from: D3.JS
 
-
-
 */
 
 var rawdata     = [];
@@ -22,6 +20,7 @@ var worldseries = [];
 var wildcards   = [];
 var max_timeout = 0;
 var teamnames_sorted = Array();
+var payroll_scale, winamt_scale;
 
 d3.csv(datafile, function(d) {
 		rawdata = d;	
@@ -45,12 +44,6 @@ window.onload = function(){
 		})
 	});
 	
-	$("#invo").click(function(){
-	
-		window.location = "http://www.goinvo.com";
-	
-	});
-	
 	document.onselectstart = function() {return false;} 
 	
 };
@@ -58,7 +51,6 @@ window.onload = function(){
 function start(){
 	
 	columnnames = d3.keys(rawdata[0]);
-	
 	fillteams();
 	
 }
@@ -450,12 +442,12 @@ function initBarChart(req_relationship, filter_by){
 		}
 	}	
 	//get a scale for the payroll
-	var payroll_scale = d3.scale.linear()
+	payroll_scale = d3.scale.linear()
 		.domain([d3.min(league_payroll), d3.max(league_payroll)])
 		.range([50, 590]);
 	
 	//get a scale for the win amounts
-	var winamt_scale = d3.scale.linear()
+	winamt_scale = d3.scale.linear()
 		.domain([d3.min(league_winamts), d3.max(league_winamts)])
 		.range([50, 590]);
 	
@@ -1010,6 +1002,36 @@ function predictionPostSeason( psg ){
 //BAR CHAR
 function slideAndLoad( req_relationship, filter_by ){
 	
+	console.log( req_relationship );
+	console.log( filter_by );
+	
+	teamnames_sorted = sortTeams(filter_by, req_relationship);
+	
+	//the bar chart will be showing payroll
+	var payroll_subdata = Array();
+	//AND win ammounts
+	var winamt_subdata  = Array();
+	
+	//loop through the teams and get the data
+	for(var i = 0; i < teamnames_sorted.length; i++)
+	{
+		//get the row of each team associated with the relationship
+		//that was passed in as an argument to this function
+		var trow   = teams[ teamnames_sorted[i] ][req_relationship];
+		//grab the payroll and win amounts
+		var trow_payroll = (trow["payroll"]);
+		var trow_win_amt = (trow["#-of-wins"]);
+		if(req_relationship == "2012"){
+			trow_win_amt = trow["theoretical-2012-based-on-%-pre-error"];
+		}
+		//because payroll was stored as xxx,xxx,xxx.xx
+		var trow_payroll = parseInt( trow_payroll.replace(/,/g,'') );
+		var trow_win_amt = parseInt( trow_win_amt );
+		//add those values into the data arrays
+		payroll_subdata.push( trow_payroll );
+		winamt_subdata.push( trow_win_amt );
+	}
+	
 	d3.selectAll("post_season_stuff").transition().duration(300)
 		.attr("opacity",0.0);
 	
@@ -1031,12 +1053,79 @@ function slideAndLoad( req_relationship, filter_by ){
 			
 	}).each("end", function(){ 
 	
-		d3.selectAll(".team_bars_container").selectAll("rect").transition().duration(300)
-		.attr("width",0);
-		setTimeout(function() { initBarChart( req_relationship, filter_by ) }, 300);
+		var groups = d3.selectAll(".team_bars_container");
+		groups.on("mouseover",function(d){
+			var height  = ( 160 + ( (teamnames.length * 20) + (teamnames.length * 9) ) );
+			teamtooltip(req_relationship, d3.select(this), payroll_scale, winamt_scale, height);
+			d3.select(this).attr("opacity",1.0);
+			d3.selectAll(".post_season_stuff").transition().duration(400)
+				.attr("opacity",0.0);
+		});
+		
+		groups.transition().duration(300)
+			.attr("transform",function(d){
+				var i = teamnames_sorted.indexOf( d );
+				var xpos = 0;
+				var ypos = 150 +( (i * 20) + (i * 9) );
+				return "translate("+xpos+","+ypos+")";
+			});
+		var bars = groups.selectAll('.team_payroll_data');
+		var barz = groups.selectAll('.team_winamt_data');
+		bars.transition().duration(300)
+			.attr("width",function( d ){
+				var i = teamnames_sorted.indexOf( d );
+				var amt  = payroll_subdata[i];
+				var samt = payroll_scale(amt);
+				return samt;
+			});
+		barz.transition().duration(300)
+			.attr("width",function( d ){
+				var i = teamnames_sorted.indexOf( d );
+				var amt  = winamt_subdata[i];
+				var samt = winamt_scale(amt);
+				return samt;
+			});
+		//setTimeout(function() { initBarChart( req_relationship, filter_by ) }, 300);
 		//initBarChart( req_relationship );
 	});
 	
+	var vis = d3.select("#vis")
+				.selectAll("svg");
+	
+	//CREATE THE POST SEASON STUFF
+	postSeasonSpace( vis, req_relationship );
+	
+	
+	var subdata_keynames = ["payroll","wins"];
+	
+	var wopac, popac;
+	var wope, pope;
+	if(filter_by == "payroll"){
+		wopac = 0;
+		popac = 1;
+		wope  = "none";
+		pope  = "all";
+	}else{
+		wopac = 1;
+		popac = 0;
+		wope  = "all";
+		pope  = "none";
+	}
+	
+	//create the group that holds the two images that are visibile when sorting by win amount information
+	d3.selectAll(".win_sort")
+					.attr("opacity", wopac).attr("pointer-events",wope)
+					.on("click",function(){ d3.select(this).attr("opacity",0).attr("pointer-events","none")
+											d3.select("#vis").selectAll(".payroll_sort").attr("opacity",1).attr("pointer-events","all");
+											slideAndLoad(req_relationship, "payroll");});
+	
+	//create the group that holds the two images that are visibile when sorting by payroll information
+	d3.selectAll(".payroll_sort")
+					.attr("opacity", popac).attr("pointer-events", pope)
+					.on("click",function(){ d3.select(this).attr("opacity",0).attr("pointer-events","none");
+											d3.select("#vis").selectAll(".win_sort").attr("opacity",1).attr("pointer-events","all");
+											slideAndLoad(req_relationship, "#-of-wins");});
+		
 }
 
 
