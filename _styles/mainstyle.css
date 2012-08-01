@@ -6,7 +6,11 @@
 a img{
 	outline:none;
 }
-
+#counter{
+	position: fixed;
+	top:-10000px;
+	left: -10000px;
+}
 body{
 	background-color:#e9edef;
 	padding-left:20px;
